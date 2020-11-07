@@ -3,13 +3,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class ReadThread extends Thread {
     private BufferedReader reader;
-    private MainFrame mainFrame;
+    private Socket socket;
+    private ChatClient chatClient;
 
-    public ReadThread(Socket socket, MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    public ReadThread(Socket socket, ChatClient chatClient) {
+        this.chatClient = chatClient;
+        this.socket = socket;
 
         try {
             InputStream input = socket.getInputStream();
@@ -24,12 +28,27 @@ public class ReadThread extends Thread {
         while (true) {
             try {
                 String response = reader.readLine();
-                mainFrame.addMessageToBoard(response);
+                System.out.println("\n" + getMessageDescription()+response);
+                if (chatClient.getUserName() != null) {
+                    System.out.print(getMessageDescription(chatClient.getUserName()));
+                }
             } catch (IOException ex) {
                 System.out.println("Error reading from server: " + ex.getMessage());
                 ex.printStackTrace();
                 break;
             }
         }
+    }
+
+    private String getMessageDescription() {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalDateTime now = LocalDateTime.now();
+        return "<"+dateTimeFormatter.format(now)+">";
+    }
+
+    private String getMessageDescription(String userName) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalDateTime now = LocalDateTime.now();
+        return "<"+dateTimeFormatter.format(now)+">"+"["+userName+"]: ";
     }
 }

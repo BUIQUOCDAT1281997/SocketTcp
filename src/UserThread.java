@@ -1,9 +1,11 @@
 import java.io.*;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class UserThread extends Thread{
-    private Socket socket;
-    private ChatServer server;
+    private final Socket socket;
+    private final ChatServer server;
     private PrintWriter writer;
 
     public UserThread(Socket socket, ChatServer server) {
@@ -25,19 +27,20 @@ public class UserThread extends Thread{
             String userName = reader.readLine();
             server.addUserName(userName);
 
-            String serverMessage = userName + " connected";
+            String serverMessage = "New user connected: " + userName;
             server.broadcast(serverMessage, this);
 
             String clientMessages;
 
             do {
                 clientMessages = reader.readLine();
-                server.broadcast(clientMessages, this);
+                serverMessage = "["+userName+"]: " + clientMessages;
+                server.broadcast(serverMessage, this);
+                System.out.println(getMessageDescription(userName)+clientMessages);
             } while (!clientMessages.equals("bye"));
 
             server.removeUser(userName, this);
             socket.close();
-
             serverMessage = userName + " has quited.";
             server.broadcast(serverMessage, this);
 
@@ -47,13 +50,19 @@ public class UserThread extends Thread{
         }
     }
 
-//    private void printUsers() {
-//        if (server.hasUsers()) {
-//            writer.println("Connected users: " + server.getUserNames());
-//        } else {
-//            writer.println("No other users connected");
-//        }
-//    }
+    private String getMessageDescription(String userName) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        LocalDateTime now = LocalDateTime.now();
+        return "<"+dateTimeFormatter.format(now)+">"+"["+userName+"]: ";
+    }
+
+    private void printUsers() {
+        if (server.hasUsers()) {
+            writer.println("Connected users: " + server.getUserNames());
+        } else {
+            writer.println("No other users connected");
+        }
+    }
 
     public void sendMessage(String message) {
         writer.println(message);

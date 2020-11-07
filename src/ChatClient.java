@@ -4,15 +4,14 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-public class ChatClient {
-    private String userName;
-    private PrintWriter writer;
+public class ChatClient{
     private String hostName;
     private int port;
-    private MainFrame mainFrame;
+    private String userName;
 
-    public ChatClient(MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    public ChatClient(String hostName, int port) {
+        this.hostName = hostName;
+        this.port = port;
     }
 
     public void execute() {
@@ -21,16 +20,8 @@ public class ChatClient {
             Socket socket = new Socket(hostName, port);
             System.out.println("Connected to the chat server");
 
-            try {
-                OutputStream output = socket.getOutputStream();
-                writer = new PrintWriter(output, true);
-                writer.println(userName);
-            } catch (IOException ex) {
-                System.out.println("Error getting output stream: " + ex.getMessage());
-                ex.printStackTrace();
-            }
-
-            new ReadThread(socket, mainFrame).start();
+            new ReadThread(socket,this).start();
+            new WriteThread(socket, this).start();
 
         } catch (UnknownHostException ex) {
             System.out.println("Server not found: " + ex.getMessage());
@@ -47,23 +38,13 @@ public class ChatClient {
         this.userName = userName;
     }
 
-    public void sendMessage(String message) {
-        writer.println(message);
-    }
 
-    public String getHostName() {
-        return hostName;
-    }
+    public static void main(String[] args) {
+        if (args.length<2) return;
+        String hostName = args[0];
+        int port = Integer.parseInt(args[1]);
 
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
+        ChatClient client = new ChatClient(hostName, port);
+        client.execute();
     }
 }
