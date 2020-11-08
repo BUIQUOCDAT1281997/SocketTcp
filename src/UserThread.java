@@ -56,13 +56,13 @@ public class UserThread extends Thread{
         return "<"+dateTimeFormatter.format(now)+">"+"["+userName+"]: ";
     }
 
-    private void printUsers() {
-        if (server.hasUsers()) {
-            writer.println("Connected users: " + server.getUserNames());
-        } else {
-            writer.println("No other users connected");
-        }
-    }
+//    private void printUsers() {
+//        if (server.hasUsers()) {
+//            writer.println("Connected users: " + server.getUserNames());
+//        } else {
+//            writer.println("No other users connected");
+//        }
+//    }
 
     public void sendMessage(String message) {
         writer.println(message);
