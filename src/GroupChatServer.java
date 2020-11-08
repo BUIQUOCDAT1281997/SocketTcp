@@ -9,21 +9,21 @@ import java.util.Set;
 
 //Group chat server
 public class GroupChatServer {
-    private final int Port = 9999;
+//    private final int Port = 9999;
     //Properties used
     private Selector selector;
     private ServerSocketChannel serverSocketChannel;
     private SocketChannel socketChannel;
 
     //The constructor completes the server connection operation
-    public GroupChatServer() throws Exception {
+    public GroupChatServer(int port) throws Exception {
         //Open selector and serverSocketChannel
         selector = Selector.open();
         serverSocketChannel = ServerSocketChannel.open();
         //Set non-blocking
         serverSocketChannel.configureBlocking(false);
         //Listening port
-        serverSocketChannel.socket().bind(new InetSocketAddress(Port));
+        serverSocketChannel.socket().bind(new InetSocketAddress(port));
         //registered
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
 
@@ -34,7 +34,12 @@ public class GroupChatServer {
     //Method of reading message
 
     public static void main(String[] args) throws Exception {
-        GroupChatServer server = new GroupChatServer();
+        if (args.length<1) {
+            System.out.println("Syntax: java ChatServer port");
+            return;
+        }
+        int port = Integer.parseInt(args[0]);
+        GroupChatServer server = new GroupChatServer(port);
         server.Listen();
     }
 

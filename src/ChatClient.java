@@ -1,3 +1,4 @@
+import java.io.Console;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -17,11 +18,17 @@ public class ChatClient{
     public void execute() {
         try {
 
+            Console console = System.console();
+            String userName = console.readLine("\nEnter your name: ");
+            setUserName(userName);
+
             Socket socket = new Socket(hostName, port);
             System.out.println("Connected to the chat server");
 
+
+            new WriteThread(socket, this, userName).start();
             new ReadThread(socket,this).start();
-            new WriteThread(socket, this).start();
+
 
         } catch (UnknownHostException ex) {
             System.out.println("Server not found: " + ex.getMessage());

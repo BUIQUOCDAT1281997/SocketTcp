@@ -10,10 +10,12 @@ public class WriteThread extends Thread {
     private PrintWriter writer;
     private Socket socket;
     private ChatClient chatClient;
+    private String userName;
 
-    public WriteThread(Socket socket, ChatClient chatClient) {
+    public WriteThread(Socket socket, ChatClient chatClient, String userName) {
         this.socket = socket;
         this.chatClient = chatClient;
+        this.userName = userName;
         try {
             OutputStream output = socket.getOutputStream();
             writer = new PrintWriter(output, true);
@@ -25,14 +27,15 @@ public class WriteThread extends Thread {
 
     public void run() {
         Console console = System.console();
-        String userName = console.readLine("\nEnter your name: ");
-        chatClient.setUserName(userName);
+//        String userName = console.readLine("\nEnter your name: ");
+//        chatClient.setUserName(userName);
         writer.println(userName);
 
         String text;
 
         do {
-            text = console.readLine(getMessageDescription(userName));
+//            text = console.readLine(getMessageDescription(userName));
+            text = console.readLine();
             writer.println(text);
         } while (!text.equals("bye"));
 

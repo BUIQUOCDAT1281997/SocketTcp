@@ -12,17 +12,17 @@ import java.util.Scanner;
 
 public class GroupChatClient {
     //Commonly used attributes
-    private  final String IP="127.0.0.1";
-    private  final int Port=9999;
+//    private  final String IP="192.168.101.41";
+//    private  final int Port=9999;
     private  Selector selector;
     private  SocketChannel socketChannel;
 //    private  String clientname;
     //Construction method
-    public GroupChatClient() throws Exception{
+    public GroupChatClient(String ip, int port) throws Exception{
         //turn on
         selector = Selector.open();
         //connection
-        socketChannel = SocketChannel.open(new InetSocketAddress(IP,Port));
+        socketChannel = SocketChannel.open(new InetSocketAddress(ip,port));
         //Set non-blocking
         socketChannel.configureBlocking(false);
 
@@ -72,7 +72,15 @@ public class GroupChatClient {
     }
 
     public static void main(String[] args) throws Exception {
-        GroupChatClient chatClient=new GroupChatClient();
+
+        if (args.length<2) return;
+        String ip = args[0];
+        int port = Integer.parseInt(args[1]);
+
+        Console console = System.console();
+        String userName = console.readLine("\nEnter your name: ");
+
+        GroupChatClient chatClient=new GroupChatClient(ip, port);
 
         new Thread(() -> {
             while (true){
@@ -84,8 +92,7 @@ public class GroupChatClient {
                 }
             }
         }).start();
-        Console console = System.console();
-        String userName = console.readLine("\nEnter your name: ");
+
         //send data
         Scanner scanner=new Scanner(System.in);
         //Input line by line
